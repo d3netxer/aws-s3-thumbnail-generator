@@ -1,4 +1,6 @@
 # Distribution / packaging
+package-lock.json
+.env
 .Python
 env/
 build/
