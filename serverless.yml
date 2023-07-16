@@ -35,8 +35,8 @@ functions:
           bucket: "${env:PICS_UPLOADS_BUCKET}-${env:STAGE}"
           existing: true
           event: s3:ObjectCreated:*
-          rules:
-            - suffix: .png
+          # rules:
+          #   - suffix: .png
 
 # This plugin will install all code dependencies from requirements.txt and will upload to lambda.
 plugins:

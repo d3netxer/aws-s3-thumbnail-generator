@@ -8,12 +8,13 @@ size = int(os.environ['THUMBNAIL_SIZE'])
 
 def s3_thumbnail_generator(event, context):
     # print event
+    print('hi2')
     print(event)
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
 
     # generate thumbnail only on non thumbnail images
-    if (not key.endswith("_thumbnail.png")):
+    if ("_thumbnail." not in key):
         # get the image
         image = get_s3_image(bucket, key)
         # resize the image
@@ -38,21 +39,22 @@ def image_to_thumbnail(image):
 
 def new_filename(key):
     key_split = key.rsplit('.', 1)
-    return key_split[0] + "_thumbnail.png"
+    return key_split[0] + "_thumbnail." + key_split[1]
 
 def upload_to_s3(bucket, key, image):
     # We're saving the image into a cStringIO object to avoid writing to disk
     out_thumbnail = io.BytesIO()
     # You MUST specify the file type because there is no file name to discern
     # it from
-    image.save(out_thumbnail, 'PNG')
+    file_extension = key.rsplit('.', 1)[1].upper()
+    image.save(out_thumbnail, file_extension)
     out_thumbnail.seek(0)
 
     response = s3.put_object(
         ACL='public-read',
         Body=out_thumbnail,
         Bucket=bucket,
-        ContentType='image/png',
+        ContentType='image/{}'.format(file_extension.lower()),
         Key=key
     )
     print(response)
